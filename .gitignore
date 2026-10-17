@@ -1,0 +1,15 @@
+# Local-only files: not part of the published website
+.claude/
+.vscode/
+phone-preview.html
+laptop-preview.html
+qr.html
+Portfolio-OLD-backup.html
+desktop.ini
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
