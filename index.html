@@ -248,6 +248,15 @@
       .contact .btn { width: 100%; }
     }
 
+    /* Shorter laptop and tablet screens: a more compact opening, leaving room above it for the drones */
+    @media (min-width: 900px) and (max-height: 820px) {
+      .hero { padding-bottom: 6vh; }
+      .hero .kicker { display: none; }
+      .hero h1 { font-size: clamp(2.2rem, 4.4vw, 3.4rem); margin-bottom: 0.8rem; }
+      .hero p.lead { font-size: 1.02rem; margin-bottom: 1.4rem; }
+      .soon { margin-bottom: 0.9rem; }
+    }
+
     /* Phones held sideways (short, wide screens): side by side like the desktop, story in one half, drones in the other */
     @media (orientation: landscape) and (max-height: 500px) {
       .bar { padding: 0.6rem 1rem; }
@@ -734,22 +743,41 @@
         return { x: w * 0.5, y: Math.max(top + r * 1.02, bottom - r * 1.02), r };
       }
 
+      // The opening's wordmark and logo fit themselves into the free sky between the top bar and the opening text,
+      // measured from the page layout (ignoring reveal animations), so they never overlap the badge or headline
+      const heroFirst = document.querySelector('#hero .copy > :first-child');
+      const extents = {};
+      function extent(key) {
+        if (!extents[key]) {
+          const pts = formation(key);
+          extents[key] = pts.reduce((e, p) => ({ x0: Math.min(e.x0, p.x), x1: Math.max(e.x1, p.x), y0: Math.min(e.y0, p.y), y1: Math.max(e.y1, p.y) }), { x0: 1, x1: -1, y0: 1, y1: -1 });
+        }
+        return extents[key];
+      }
+      function pageTop(el) { let y = 0; for (let n = el; n; n = n.offsetParent) y += n.offsetTop; return y; }
+      function heroAnchor(key) {
+        const e = extent(key), margin = Math.max(14, h * 0.025);
+        const top = bar.offsetHeight + margin, bottom = pageTop(heroFirst) - margin;
+        const maxR = key === 'logo' ? (mobile ? Math.min(w * 0.3, h * 0.17) : Math.min(w * 0.2, h * 0.2)) : (mobile ? w * 0.43 : Math.min(w * 0.3, h * 0.5));
+        const r = Math.max(24, Math.min(maxR, (bottom - top) / (e.y1 - e.y0), (w * 0.92) / (e.x1 - e.x0)));
+        // centre the shape in the free band (top of the shape at e.y0 * r from the anchor)
+        const y = top + Math.max(0, (bottom - top) - r * (e.y1 - e.y0)) / 2 - r * e.y0;
+        return { x: w * 0.5, y, r };
+      }
+
       function anchorFor(section, current) {
         const key = current.startsWith('welcome') ? 'welcome' : current, side = section.dataset.side;
         if (key === 'sunrise') return sunAnchor();
+        if (!short && (key === 'palsky' || key === 'logo')) return heroAnchor(key);
         if (short) {
           // Story on one side, drones in the other half; the opening's text sits on the right
           const r = key === 'palsky' || key === 'welcome' ? Math.min(w * 0.2, h * 0.55) : key === 'logo' ? Math.min(w * 0.13, h * 0.3) : Math.min(w * 0.17, h * 0.34);
           return { x: side === 'left' ? w * 0.75 : w * 0.24, y: h * 0.56, r };
         }
         if (mobile) {
-          if (key === 'logo') return { x: w * 0.5, y: h * 0.25, r: Math.min(w * 0.3, h * 0.17) };
-          if (key === 'palsky') return { x: w * 0.5, y: h * 0.27, r: w * 0.43 };
           if (key === 'welcome') return { x: w * 0.5, y: h * 0.2, r: w * 0.48 };
           return { x: w * 0.5, y: h * 0.27, r: Math.min(w * 0.4, h * 0.2) };
         }
-        if (key === 'palsky') return { x: w * 0.5, y: h * 0.25, r: Math.min(w * 0.3, h * 0.5) };
-        if (key === 'logo') return { x: w * 0.5, y: h * 0.24, r: Math.min(w * 0.2, h * 0.16) };
         const r = Math.min(w * 0.22, h * 0.32);
         if (side === 'left') return { x: w * 0.71, y: h * 0.48, r };
         if (side === 'right') return { x: w * 0.29, y: h * 0.48, r };
@@ -969,6 +997,12 @@
         const show = !mobile && !short && settled && active && active.dataset.side !== 'center';
         caption.classList.toggle('on', !!show);
         if (show) caption.style.transform = `translate(${anchor.x.toFixed(1)}px, ${(anchor.y + lowest * anchor.r + 34).toFixed(1)}px) translateX(-50%)`;
+        // Never let the label touch the story text: on tight screens it simply stays hidden
+        if (show) {
+          const c = caption.getBoundingClientRect(), t = active.querySelector('.copy').getBoundingClientRect();
+          const clash = c.left < t.right + 12 && t.left - 12 < c.right && c.top < t.bottom && t.top < c.bottom;
+          if (clash || c.bottom > h - 8) caption.classList.remove('on');
+        }
       }
 
       let last = 0;
