@@ -1,0 +1,302 @@
+/* PALSKY website styles */
+
+/* Fonts are served from this site (latin subsets; licences in fonts/licences) */
+@font-face { font-family: 'Inter'; font-style: normal; font-weight: 400; font-display: swap; src: url(fonts/inter-400.woff2) format('woff2'); }
+@font-face { font-family: 'Inter'; font-style: normal; font-weight: 500; font-display: swap; src: url(fonts/inter-500.woff2) format('woff2'); }
+@font-face { font-family: 'Inter'; font-style: normal; font-weight: 600; font-display: swap; src: url(fonts/inter-600.woff2) format('woff2'); }
+@font-face { font-family: 'Instrument Serif'; font-style: normal; font-weight: 400; font-display: swap; src: url(fonts/instrument-serif-400.woff2) format('woff2'); }
+@font-face { font-family: 'Instrument Serif'; font-style: italic; font-weight: 400; font-display: swap; src: url(fonts/instrument-serif-400-italic.woff2) format('woff2'); }
+@font-face { font-family: 'Syncopate'; font-style: normal; font-weight: 400; font-display: swap; src: url(fonts/syncopate-400.woff2) format('woff2'); }
+@font-face { font-family: 'Syncopate'; font-style: normal; font-weight: 700; font-display: swap; src: url(fonts/syncopate-700.woff2) format('woff2'); }
+@font-face { font-family: 'Unbounded'; font-style: normal; font-weight: 600; font-display: swap; src: url(fonts/unbounded-600.woff2) format('woff2'); }
+@font-face { font-family: 'Bricolage Grotesque'; font-style: normal; font-weight: 800; font-display: swap; src: url(fonts/bricolage-grotesque-800.woff2) format('woff2'); }
+
+/* Brand: the night, the sky blue, the horizon orange (sunset / sunrise) and white */
+:root {
+  --night: #03040c;
+  --night-2: #0a1430;
+  --sky: #5ab8f0;
+  --horizon: #ff8a3d;
+  --gold: #ffc46e;
+  --white: #ffffff;
+  --muted: rgba(255, 255, 255, 0.74);
+  --faint: rgba(255, 255, 255, 0.5);
+  --line: rgba(255, 255, 255, 0.14);
+  --glass: rgba(6, 10, 26, 0.55);
+  color-scheme: dark;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+/* Shown instead of the page when another website puts it inside a frame (clickjacking guard) */
+html.framed body > * { visibility: hidden !important; }
+html.framed body > .framed-note { visibility: visible !important; position: fixed; inset: 0; display: grid; place-items: center; padding: 2rem; text-align: center; font: 600 1rem/1.5 sans-serif; color: #fff; background: #03040c; z-index: 2147483647; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--night);
+  color: var(--white);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+a { color: inherit; text-decoration: none; }
+/* Skip link: hidden until a keyboard user tabs to it, then jumps past the top bar and chapter dots to the story */
+.skip { position: fixed; left: 1rem; top: 0; z-index: 30; transform: translateY(-120%); padding: 0.7rem 1.1rem; border-radius: 0 0 12px 12px; background: var(--white); color: #03040c; font-weight: 600; font-size: 0.95rem; transition: transform 0.2s ease; }
+.skip:focus { transform: translateY(0); }
+main:focus { outline: none; }
+
+:focus-visible { outline: 2px solid var(--horizon); outline-offset: 4px; border-radius: 6px; }
+
+/* The sky: one canvas behind the whole story */
+#sky { position: fixed; inset: 0; width: 100%; height: 100%; display: block; z-index: 0; }
+
+main { position: relative; z-index: 1; }
+.wrap { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+.chapter > .wrap { width: 100%; }
+
+/* ===== Top bar ===== */
+.bar {
+  position: fixed; inset: 0 0 auto 0; z-index: 10;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1.1rem 2rem;
+  background: linear-gradient(180deg, rgba(3, 4, 12, 0.75), transparent);
+  transition: background 0.3s ease, border-color 0.3s ease;
+  border-bottom: 1px solid transparent;
+}
+/* Once the page scrolls, the bar gets a solid night backing so text never shows through it */
+.bar.scrolled { background: rgba(3, 4, 12, 0.82); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom-color: var(--line); }
+/* The brand's primary logo: logomark + palsky in Unbounded SemiBold, lowercase */
+.brand { display: inline-flex; align-items: center; gap: 0.55rem; font-family: 'Unbounded', 'Syncopate', sans-serif; font-weight: 600; font-size: 1.15rem; letter-spacing: 0.01em; line-height: 1; }
+/* The full logomark (P of drone lights over kente), with a soft edge so the black tile stands out on the night sky */
+.brand .mark { width: 38px; height: 38px; flex-shrink: 0; border-radius: 9px; box-shadow: 0 0 0 1px rgba(246, 241, 231, 0.28), 0 0 18px rgba(252, 209, 22, 0.18); }
+.bar-actions { display: flex; align-items: center; gap: 1.25rem; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.55rem;
+  padding: 0.85rem 1.6rem;
+  border-radius: 999px;
+  font: 600 0.95rem/1 'Inter', sans-serif;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, border-color 0.25s ease;
+}
+.btn-sun { background: var(--horizon); color: #1a0d03; box-shadow: 0 10px 34px -10px rgba(255, 138, 61, 0.9); }
+.btn-sun:hover { transform: translateY(-2px); background: #ff9d58; box-shadow: 0 16px 40px -12px rgba(255, 138, 61, 1); }
+.btn-glass { color: var(--white); background: rgba(255, 255, 255, 0.06); border-color: rgba(255, 255, 255, 0.28); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.btn-glass:hover { transform: translateY(-2px); border-color: var(--sky); }
+.btn-sm { padding: 0.6rem 1.15rem; font-size: 0.85rem; }
+
+/* ===== Chapter rail (desktop) ===== */
+.rail {
+  display: none;
+  position: fixed; right: 1.6rem; top: 50%; transform: translateY(-50%); z-index: 10;
+  flex-direction: column; gap: 0.95rem; list-style: none;
+}
+@media (min-width: 1200px) and (min-height: 560px) { .rail { display: flex; } .chapter .wrap { padding-right: 4rem; } }
+/* Dots only; a chapter's name shows beside its dot on hover or keyboard focus */
+.rail a { position: relative; display: grid; place-items: center; width: 17px; height: 17px; color: var(--faint); font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase; }
+.rail a span { position: absolute; right: calc(100% + 0.6rem); white-space: nowrap; padding: 0.25rem 0.6rem; border-radius: 999px; background: rgba(3, 4, 12, 0.85); opacity: 0; transform: translateX(6px); transition: opacity 0.3s, transform 0.3s; pointer-events: none; }
+.rail a::after { content: ''; width: 7px; height: 7px; border-radius: 50%; background: rgba(255, 255, 255, 0.35); transition: all 0.35s ease; }
+.rail a:hover span, .rail a:focus-visible span { opacity: 1; transform: none; color: var(--white); }
+.rail a.on { color: var(--white); }
+.rail a.on::after { background: var(--horizon); box-shadow: 0 0 0 4px rgba(255, 138, 61, 0.22), 0 0 14px var(--horizon); }
+
+/* ===== Live formation label ===== */
+/* Caption that follows the drone formation (placed by script); never over the story text */
+.live {
+  position: fixed; left: 0; top: 0; z-index: 5; pointer-events: none;
+  opacity: 0; transition: opacity 0.4s ease;
+  white-space: nowrap;
+  display: inline-flex; align-items: center; gap: 0.55rem;
+  font-family: 'Syncopate', sans-serif; font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--muted);
+  padding: 0.45rem 0.85rem;
+  border-radius: 999px;
+  background: rgba(3, 4, 12, 0.5);
+  border: 1px solid var(--line);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+}
+.live.on { opacity: 1; }
+.live:not(.on) { transition: none; }   /* vanish at once when the formation moves; only fade in */
+.live .rec { width: 7px; height: 7px; border-radius: 50%; background: var(--horizon); box-shadow: 0 0 10px var(--horizon); animation: rec 1.4s ease-in-out infinite; }
+.live b { color: var(--white); font-weight: 700; }
+@keyframes rec { 50% { opacity: 0.25; } }
+
+/* ===== Chapters ===== */
+.chapter {
+  position: relative;
+  min-height: 100vh; min-height: 100svh;
+  display: flex; align-items: center;
+  padding: 7rem 0;
+}
+.copy { max-width: 520px; }
+.chapter[data-side="right"] .copy { margin-left: auto; }
+.chapter[data-side="center"] .copy { margin: 0 auto; text-align: center; max-width: 720px; }
+
+.num {
+  display: inline-flex; align-items: center; gap: 0.8rem;
+  font-family: 'Syncopate', sans-serif; font-size: 0.68rem; letter-spacing: 0.26em; text-transform: uppercase;
+  color: var(--sky);
+  margin-bottom: 1.4rem;
+}
+.num::before { content: ''; width: 34px; height: 1px; background: currentColor; }
+.chapter[data-side="center"] .num::after { content: ''; width: 34px; height: 1px; background: currentColor; }
+
+h1, h2 { font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; letter-spacing: -0.01em; }
+h2 { font-size: clamp(2.5rem, 5.8vw, 4.6rem); line-height: 1.02; margin-bottom: 1.4rem; text-shadow: 0 2px 30px rgba(3, 4, 12, 0.8); }
+h2 em { color: var(--horizon); }
+h2 .sky { color: var(--sky); font-style: italic; }
+.copy p { color: var(--muted); font-size: 1.08rem; margin-bottom: 1rem; text-shadow: 0 1px 14px rgba(3, 4, 12, 0.9); }
+.copy p strong { color: var(--white); font-weight: 600; }
+
+.tags { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.6rem; }
+.tags span { font-size: 0.82rem; font-weight: 500; padding: 0.38rem 0.9rem; border-radius: 999px; background: rgba(255, 255, 255, 0.06); border: 1px solid var(--line); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.chapter[data-side="center"] .tags { justify-content: center; }
+
+.proverb { margin-top: 1.6rem; padding-left: 1.1rem; border-left: 2px solid var(--horizon); font-family: 'Instrument Serif', serif; font-style: italic; font-size: 1.35rem; line-height: 1.35; color: var(--white); }
+.proverb small { display: block; margin-top: 0.35rem; font-family: 'Inter', sans-serif; font-style: normal; font-size: 0.78rem; letter-spacing: 0.06em; color: var(--faint); }
+
+/* ===== Hero ===== */
+.hero { align-items: flex-end; padding-bottom: 12vh; }
+.hero .copy { max-width: 760px; }
+.kicker { font-family: 'Syncopate', sans-serif; font-size: 0.66rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 1.1rem; }
+.hero h1 { font-size: clamp(2.3rem, 5.4vw, 4.4rem); line-height: 1.04; margin-bottom: 1.2rem; text-shadow: 0 2px 30px rgba(3, 4, 12, 0.9); }
+.hero h1 em { color: var(--horizon); }
+.hero p.lead { color: var(--muted); font-size: 1.12rem; max-width: 560px; margin: 0 auto 2rem; }
+.actions { display: flex; flex-wrap: wrap; gap: 0.8rem; justify-content: center; }
+.scroll-cue { margin-top: 2.6rem; display: inline-flex; flex-direction: column; align-items: center; gap: 0.6rem; font-size: 0.68rem; letter-spacing: 0.26em; text-transform: uppercase; color: var(--faint); }
+.scroll-cue i { width: 1px; height: 46px; background: linear-gradient(var(--white), transparent); animation: cue 2.2s ease-in-out infinite; transform-origin: top; }
+@keyframes cue { 0% { transform: scaleY(0); opacity: 1; } 70% { transform: scaleY(1); opacity: 1; } 100% { transform: scaleY(1); opacity: 0; } }
+.soon { display: inline-flex; align-items: center; gap: 0.5rem; margin-bottom: 1.3rem; font-size: 0.78rem; font-weight: 600; padding: 0.35rem 0.9rem; border-radius: 999px; background: rgba(34, 18, 6, 0.82); border: 1px solid rgba(255, 138, 61, 0.4); color: var(--gold); }
+.soon::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--horizon); box-shadow: 0 0 10px var(--horizon); }
+
+/* ===== Culture ribbon ===== */
+.ribbon { position: relative; z-index: 1; overflow: hidden; padding: 1.3rem 0; border-block: 1px solid var(--line); background: rgba(3, 4, 12, 0.45); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+.ribbon-track { display: inline-flex; white-space: nowrap; animation: drift 80s linear infinite; }
+.ribbon-track span { font-family: 'Instrument Serif', serif; font-style: italic; font-size: clamp(1.4rem, 3vw, 2.1rem); padding: 0 1.4rem; color: rgba(255, 255, 255, 0.86); }
+.ribbon-track span small { font-family: 'Inter', sans-serif; font-style: normal; font-size: 0.75rem; letter-spacing: 0.08em; color: var(--faint); margin-left: 0.6rem; }
+.ribbon-track b { color: var(--horizon); font-weight: 400; align-self: center; }
+@keyframes drift { to { transform: translateX(-50%); } }
+
+/* ===== Craft: process + why drones ===== */
+.steps { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-top: 1.8rem; counter-reset: step; }
+.step { padding: 1.1rem 1.15rem; border-radius: 16px; background: var(--glass); border: 1px solid var(--line); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+.step b { display: block; font-family: 'Syncopate', sans-serif; font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.35rem; }
+.step b::before { counter-increment: step; content: '0' counter(step) '  '; color: var(--sky); }
+.step p { font-size: 0.92rem; margin: 0; color: var(--muted); text-shadow: none; }
+
+.why { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6rem; margin-top: 0.8rem; }
+.why div { text-align: center; padding: 0.8rem 0.4rem; border-radius: 14px; border: 1px dashed rgba(90, 184, 240, 0.35); font-size: 0.78rem; color: var(--muted); line-height: 1.35; }
+.why div strong { display: block; font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 1.3rem; color: var(--white); }
+
+/* ===== Dawn / finale ===== */
+.dawn { align-items: flex-start; padding-top: 13vh; min-height: 130vh; min-height: 130svh; }
+.dawn h2 { font-size: clamp(2.5rem, 5.6vw, 4.6rem); }
+.dawn h2 em { color: var(--white); text-shadow: 0 0 40px rgba(255, 196, 110, 0.9); }
+.contact { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.8rem; margin-top: 2rem; }
+.contact .addr { width: 100%; margin-top: 0.4rem; font-size: 0.85rem; color: var(--muted); }
+.contact .addr button { font: inherit; color: var(--white); background: none; border: none; border-bottom: 1px dashed var(--faint); cursor: pointer; padding: 0; }
+.socials { display: flex; justify-content: center; gap: 0.7rem; margin-top: 1.6rem; }
+.socials a { display: inline-flex; align-items: center; gap: 0.55rem; padding: 0.55rem 1rem; border-radius: 999px; font-size: 0.85rem; font-weight: 600; background: rgba(3, 4, 12, 0.35); border: 1px solid rgba(255, 255, 255, 0.25); transition: transform 0.25s, border-color 0.25s; }
+.socials a:hover { transform: translateY(-2px); border-color: var(--white); }
+.socials svg { width: 17px; height: 17px; }
+
+footer.end {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  padding: 1.3rem 2rem;
+  display: flex; justify-content: center; flex-wrap: wrap; gap: 0.5rem; text-align: center;
+  font-size: 0.8rem; color: rgba(255, 255, 255, 0.82);
+}
+footer.end a { border-bottom: 1px solid rgba(255, 255, 255, 0.4); }
+
+/* ===== Reveal on scroll ===== */
+/* The opening is visible from the very first paint (no fade from invisible); it just drifts gently into place */
+.hero .copy > * { animation: rise 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.hero .copy > :nth-child(2) { animation-delay: 0.06s; } .hero .copy > :nth-child(3) { animation-delay: 0.12s; }
+.hero .copy > :nth-child(4) { animation-delay: 0.18s; } .hero .copy > :nth-child(5) { animation-delay: 0.24s; }
+@keyframes rise { from { transform: translateY(14px); } to { transform: none; } }
+
+.rv { opacity: 0; transform: translateY(28px); transition: opacity 1s ease, transform 1s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.rv.in { opacity: 1; transform: none; }
+.rv.d1 { transition-delay: 0.12s; } .rv.d2 { transition-delay: 0.24s; } .rv.d3 { transition-delay: 0.36s; } .rv.d4 { transition-delay: 0.48s; }
+.no-js .rv { opacity: 1; transform: none; }
+
+/* ===== Responsive ===== */
+@media (max-width: 900px) {
+  .bar { padding: 0.9rem 1rem; }
+  .wrap { padding: 0 1rem; }
+  /* Phones: the formation flies in the top half, the story sits below it */
+  .chapter { align-items: flex-end; min-height: 125vh; min-height: 125svh; padding: 52vh 0 4rem; }
+  .chapter .copy, .chapter[data-side="right"] .copy { margin: 0 auto; max-width: 560px; padding: 1.4rem 1.2rem; border-radius: 22px; background: linear-gradient(180deg, rgba(3, 4, 12, 0.8), rgba(3, 4, 12, 0.9) 30%); }
+  .hero { padding-top: 40vh; padding-bottom: 4rem; min-height: 100vh; min-height: 100svh; }
+  .hero .kicker { display: none; }
+  .hero h1 { font-size: 2.3rem; }
+  .hero p.lead { font-size: 1rem; margin-bottom: 1.5rem; }
+  .hero .copy { background: none !important; padding: 0 !important; text-align: center; }
+  .dawn { padding-top: 14vh; align-items: flex-start; min-height: 135svh; }
+  .dawn .copy { background: none !important; }
+  .steps { grid-template-columns: 1fr; }
+  .why { grid-template-columns: 1fr 1fr; }
+  .live { display: none; }
+  .dawn { flex-direction: column; padding-bottom: 40vh; padding-bottom: 40svh; }   /* open sky under the footer, where the closing sun shines */
+  footer.end { position: static; margin-top: 1.5rem; padding: 1rem; flex-direction: column; align-items: center; text-align: center; }
+}
+@media (max-width: 420px) {
+  .brand { font-size: 1rem; }
+  .brand .mark { width: 32px; height: 32px; border-radius: 8px; }
+  .btn { padding: 0.8rem 1.25rem; }
+  .btn-sm { padding: 0.55rem 0.95rem; font-size: 0.8rem; }
+  .copy p { font-size: 1rem; }
+  .contact .btn { width: 100%; }
+}
+
+/* Phones and small tablets: no live blur behind panels (the sky behind them redraws every frame, and blurring it
+   costs a lot on slower phones); slightly more solid backgrounds keep the text just as readable */
+@media (max-width: 900px) {
+  .bar.scrolled { -webkit-backdrop-filter: none; backdrop-filter: none; background: rgba(3, 4, 12, 0.94); }
+  .btn-glass { -webkit-backdrop-filter: none; backdrop-filter: none; background: rgba(12, 16, 36, 0.86); }
+  .tags span { -webkit-backdrop-filter: none; backdrop-filter: none; background: rgba(12, 16, 36, 0.86); }
+  .ribbon { -webkit-backdrop-filter: none; backdrop-filter: none; background: rgba(3, 4, 12, 0.88); }
+  .step { -webkit-backdrop-filter: none; backdrop-filter: none; background: rgba(8, 12, 30, 0.92); }
+  .live { -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
+
+/* Shorter laptop and tablet screens: a more compact opening, leaving room above it for the drones */
+@media (min-width: 900px) and (max-height: 820px) {
+  .hero { padding-bottom: 6vh; }
+  .hero .kicker { display: none; }
+  .hero h1 { font-size: clamp(2.2rem, 4.4vw, 3.4rem); margin-bottom: 0.8rem; }
+  .hero p.lead { font-size: 1.02rem; margin-bottom: 1.4rem; }
+  .soon { margin-bottom: 0.9rem; }
+}
+
+/* Phones held sideways (short, wide screens): side by side like the desktop, story in one half, drones in the other */
+@media (orientation: landscape) and (max-height: 500px) {
+  .bar { padding: 0.6rem 1rem; }
+  .rail, .live { display: none !important; }
+  .chapter, .hero, .dawn { min-height: 100vh; min-height: 100svh; align-items: center; padding: 4.5rem 0 2rem; }
+  .chapter .copy, .chapter[data-side="right"] .copy { max-width: 50%; margin: 0; padding: 0; background: none; border-radius: 0; text-align: left; }
+  .chapter[data-side="right"] .copy { margin-left: auto; }
+  /* The centred chapters split too: the opening's story on the right, the closing's on the left */
+  .chapter.hero[data-side="center"] .copy { max-width: 52%; margin: 0 0 0 auto; background: none !important; padding: 0 !important; text-align: left; }
+  .chapter.dawn[data-side="center"] .copy { max-width: 56%; margin: 0; text-align: left; }
+  .hero .kicker { display: none; }
+  .hero h1 { font-size: 1.9rem; margin-bottom: 0.6rem; }
+  .hero p.lead { font-size: 0.92rem; margin: 0 0 1rem; }
+  h2 { font-size: 2rem; margin-bottom: 0.8rem; }
+  .copy p { font-size: 0.92rem; }
+  .actions, .tags, .contact, .socials { justify-content: flex-start; }
+  .chapter[data-side="center"] .num::after { display: none; }
+  .steps { grid-template-columns: 1fr 1fr; }
+  .why { grid-template-columns: 1fr 1fr; }
+  .dawn { flex-direction: column; justify-content: center; align-items: stretch; padding-bottom: 1rem; }
+  .dawn h2 { font-size: 2rem; }
+  .contact .addr { text-align: left; }
+  footer.end { position: static; margin-top: 1rem; padding: 0.5rem 1rem; flex-direction: row; justify-content: center; text-align: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .rv { opacity: 1; transform: none; }
+}
